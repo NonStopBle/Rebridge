@@ -1,0 +1,72 @@
+#include <Arduino.h>
+
+#define DATA 4
+#define CLK 16
+#define EN 17
+
+#define R_DATA 27
+#define R_EN 26
+#define R_RSV 25
+
+void setup()
+{
+  pinMode(DATA, INPUT);
+  pinMode(CLK, INPUT);
+  pinMode(EN, INPUT);
+
+  pinMode(R_DATA, INPUT);
+  pinMode(R_EN, INPUT);
+  pinMode(R_RSV, INPUT);
+
+  Serial.begin(115200);
+}
+
+void receiverBit()
+{
+}
+
+void loop()
+{
+
+  // Serial.print(BridgeConnector_RX.bitReceived, BIN);
+  // Serial.print(" , ");
+  // Serial.print(BridgeConnector_RX.bitResult);
+  // Serial.print(",");
+  // Serial.print(BridgeConnector_RX.bitPosition);
+  static bool CLK_PREV;
+  static uint8_t bitCounter, bitStamped;
+
+  if (digitalRead(CLK) == HIGH && CLK_PREV == LOW)
+  {
+    if (digitalRead(EN) == HIGH)
+    {
+      if (bitCounter > 32)
+      {
+        bitCounter = 0;
+      }
+      else
+      {
+        bool data = digitalRead(DATA);
+        bitStamped |= (data << bitCounter);
+        // Serial.println(digitalRead(DATA));
+        Serial.print(data);
+        Serial.print(",");
+        Serial.println(bitCounter);
+        bitCounter++;
+      }
+    }
+  }
+
+  CLK_PREV = digitalRead(CLK);
+
+  // if (stage == false)
+  // {
+  //   Serial.println("");
+  // }
+  // else
+  // {
+  //   Serial.println("OR");
+  // }
+  // Serial.printf("ENB : %d , Data : %d , %u , %d \n", enableBit, receiveBit, bitPosition , bitReceived);
+  // read_bridge_data(); // BridgeConverter();
+}

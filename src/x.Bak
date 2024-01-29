@@ -1,0 +1,99 @@
+#include <Arduino.h>
+
+#define DATA 4
+#define EN 16
+#define RSV 17
+
+#define R_DATA 27
+#define R_EN 26
+#define R_RSV 25
+
+// void read_bridge_data(){
+//   bool readBit = digitalRead(R_DATA);
+
+// }
+
+struct bridge_connector
+{
+  uint16_t bitReceived = 0;
+  int16_t previousBit = 0;
+  int16_t bitPosition = 0;
+  int16_t currentBit = 0;
+
+  bool enableBit = false;
+  bool receiveBit = false;
+  bool reverseBit = false;
+
+  uint8_t bitResult = false;
+};
+
+bridge_connector BridgeConnector_RX;
+static uint8_t stage = 0;
+
+void setup()
+{
+  pinMode(DATA, INPUT);
+  pinMode(EN, INPUT);
+  pinMode(RSV, INPUT);
+
+  pinMode(R_DATA, INPUT);
+  pinMode(R_EN, INPUT);
+  pinMode(R_RSV, INPUT);
+
+  digitalWrite(RSV, LOW);
+
+  // attachInterrupt(EN, read_bridge_data, CHANGE);
+
+  Serial.begin(115200);
+}
+
+bool receiveBit()
+{
+  // Wait for the clock pulse
+  while (digitalRead(EN) == LOW)
+    ;
+
+  // Read the data bit
+  bool bitValue = digitalRead(DATA);
+
+  // Wait for the clock to go low
+  while (digitalRead(EN) == HIGH)
+    ;
+
+  return bitValue;
+}
+
+unsigned char receiveData()
+{
+  static unsigned char receivedData = 0;
+  while (digitalRead(R_RSV) == LOW)
+    ;
+
+  if (digitalRead(R_RSV) == HIGH)
+  {
+    for (int i = 7; i >= 0; i--)
+    {
+      bool bitValue = receiveBit();
+      receivedData |= (bitValue << i);
+    }
+  }
+
+  return receivedData;
+}
+
+void loop()
+{
+
+  // Serial.print(BridgeConnector_RX.bitReceived, BIN);
+  // Serial.print(" , ");
+  // Serial.print(BridgeConnector_RX.bitResult);
+  // Serial.print(",");
+  // Serial.print(BridgeConnector_RX.bitPosition);
+
+  // Receive data
+  unsigned char receivedData = receiveData();
+
+  // Print received data
+  Serial.print("Received Data: ");
+  Serial.println(receivedData, BIN);
+}
