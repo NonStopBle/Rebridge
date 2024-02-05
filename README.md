@@ -18,6 +18,14 @@ Rebridge simplifies communication with old programmable logic controllers (PLCs)
 
 - **Compatibility:** Rebridge works with various old PLC models, making it versatile for legacy systems.
 
+
+This project is currently in development, and we are checking the readiness of the mentioned functions for use.
+
+```markdown
+- [X] PLC Communicate to microcontroller [A2AS(S1)] --> [ESP32] ✅
+- [ ] Microcontroller Communicate to PLC [ESP32] --> [A2AS(S1)] ❌
+```
+
 ## Usage
 
 1. Connect Clock, Data, and Enable wires from the microcontroller to the corresponding pins on the PLC.
